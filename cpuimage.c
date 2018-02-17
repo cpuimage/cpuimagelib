@@ -124,10 +124,10 @@ void CPUImageGrayscaleFilter(unsigned char *Input, unsigned char *Output, int Wi
 			unsigned char *LinePD = Output + Y * Width;
             int X = 0;
             for (; X < Width - 4; X += 4, LinePS += Channel * 4) {
-                LinePD[X + 0] = (unsigned char) (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
-                LinePD[X + 1] = (unsigned char) (B_WT * LinePS[3] + G_WT * LinePS[4] + R_WT * LinePS[5]) >> 8;
-                LinePD[X + 2] = (unsigned char) (B_WT * LinePS[6] + G_WT * LinePS[7] + R_WT * LinePS[8]) >> 8;
-                LinePD[X + 3] = (unsigned char) (B_WT * LinePS[9] + G_WT * LinePS[10] + R_WT * LinePS[11]) >> 8;
+                LinePD[X + 0] = (unsigned char) ((B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8);
+                LinePD[X + 1] = (unsigned char) ((B_WT * LinePS[3] + G_WT * LinePS[4] + R_WT * LinePS[5]) >> 8);
+                LinePD[X + 2] = (unsigned char) ((B_WT * LinePS[6] + G_WT * LinePS[7] + R_WT * LinePS[8]) >> 8);
+                LinePD[X + 3] = (unsigned char) ((B_WT * LinePS[9] + G_WT * LinePS[10] + R_WT * LinePS[11]) >> 8);
             }
             for (; X < Width; X++, LinePS += Channel) {
                 LinePD[X] = (unsigned char) (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
@@ -139,13 +139,13 @@ void CPUImageGrayscaleFilter(unsigned char *Input, unsigned char *Output, int Wi
             unsigned char *LinePD = Output + Y * Width;
             int X = 0;
             for (; X < Width - 4; X += 4, LinePS += Channel * 4) {
-                LinePD[X + 0] = (unsigned char) (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
-                LinePD[X + 1] = (unsigned char) (B_WT * LinePS[4] + G_WT * LinePS[5] + R_WT * LinePS[6]) >> 8;
-                LinePD[X + 2] = (unsigned char) (B_WT * LinePS[8] + G_WT * LinePS[9] + R_WT * LinePS[10]) >> 8;
-                LinePD[X + 3] = (unsigned char) (B_WT * LinePS[12] + G_WT * LinePS[13] + R_WT * LinePS[14]) >> 8;
+                LinePD[X + 0] = (unsigned char) ((B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8);
+                LinePD[X + 1] = (unsigned char) ((B_WT * LinePS[4] + G_WT * LinePS[5] + R_WT * LinePS[6]) >> 8);
+                LinePD[X + 2] = (unsigned char) ((B_WT * LinePS[8] + G_WT * LinePS[9] + R_WT * LinePS[10]) >> 8);
+                LinePD[X + 3] = (unsigned char) ((B_WT * LinePS[12] + G_WT * LinePS[13] + R_WT * LinePS[14]) >> 8);
             }
             for (; X < Width; X++, LinePS += Channel) {
-                LinePD[X] = (unsigned char) (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
+                LinePD[X] = (unsigned char) ((B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8);
             }
         }
 	}
