@@ -53,7 +53,7 @@ extern "C" {
 
 static inline unsigned long byteswap_ulong(unsigned long i)
 {
-	unsigned int j;
+	unsigned long j;
 	j = (i << 24);
 	j += (i << 8) & 0x00FF0000;
 	j += (i >> 8) & 0x0000FF00;
@@ -942,9 +942,9 @@ void CPUImageSaturationFilter(unsigned char *Input, unsigned char *Output, int W
 	for (int grey = 0; grey < 256; grey++)
 	{
 		unsigned char *pSaturationMap = SaturationMap + (grey << 8);
-		for (int Input = 0; Input < 256; Input++)
+		for (int input = 0; input < 256; input++)
 		{
-			pSaturationMap[0] = (unsigned char)((mix_u8((unsigned char)grey,(unsigned char) Input, saturation) + Input) * 0.5f);
+			pSaturationMap[0] = (unsigned char)((mix_u8((unsigned char)grey,(unsigned char) input, saturation) + input) * 0.5f);
 			pSaturationMap++;
 		}
 	}
