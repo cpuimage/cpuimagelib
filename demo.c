@@ -219,6 +219,11 @@ int main(int argc, char **argv)
 	int Height = 0;					  //图片高度
 	int Channels = 0;				  //图片通道数
 	unsigned char *inputImage = NULL; //输入图片指针
+ 
+	int filesize = 0;
+	CPUImageGetImageSize(szfile, &Width, &Height, &filesize);
+	printf("file:%s\nfilesize:%d\nwidth:%d\nheight%d\n", szfile, filesize, Width,Height);
+
 	double startTime = now();
 	//加载图片
 	inputImage = loadImage(szfile, &Width, &Height, &Channels);

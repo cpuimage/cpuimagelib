@@ -1,10 +1,10 @@
 ﻿#include <math.h>
-#include "cpuimage.h"
 #include <string.h>
 #include <sys/stat.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
+#include "cpuimage.h"
 /*
 
 	LevelParams redLevelParams = {
@@ -51,7 +51,7 @@ extern "C" {
 	true,
 	};*/
 
-inline unsigned long byteswap_ulong(unsigned long i)
+static inline unsigned long byteswap_ulong(unsigned long i)
 {
 	unsigned int j;
 	j = (i << 24);
@@ -61,7 +61,7 @@ inline unsigned long byteswap_ulong(unsigned long i)
 	return j;
 }
 
-inline unsigned short byteswap_ushort(unsigned short i)
+static inline unsigned short byteswap_ushort(unsigned short i)
 {
 	unsigned short j;
 	j = (i << 8);
@@ -69,12 +69,12 @@ inline unsigned short byteswap_ushort(unsigned short i)
 	return j;
 }
 
-inline unsigned char step(unsigned char edge, unsigned char x)
+static inline unsigned char step(unsigned char edge, unsigned char x)
 {
 	return x < edge ? 0 : 255;
 }
 
-inline int Abs(int x)
+static inline int Abs(int x)
 {
 	return (x ^ (x >> 31)) - (x >> 31);
 }
@@ -89,7 +89,7 @@ float dot(unsigned char R, unsigned char G, unsigned char B, float fR, float fG,
 	return (float)(R * fR + G * fG + B * fB);
 }
 
-inline float mix(float a, float b, float alpha) { return (a * (1.0f - alpha) + b * alpha); }
+static inline float mix(float a, float b, float alpha) { return (a * (1.0f - alpha) + b * alpha); }
 
 unsigned char degree(unsigned char InputColor, unsigned char OutputColor, float intensity)
 {
@@ -2899,7 +2899,7 @@ void CPUImageUnsharpMaskFilter(unsigned char *Input, unsigned char *Output, int 
 	}
 }
 
-inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int Width, int Height, int Channels, int Radius)
+static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int Width, int Height, int Channels, int Radius)
 {
 	int iRadius = Radius + 1;
 	int iScale = (int)((256.0f * 256.0f) / (2 * Radius + 1));
@@ -3125,7 +3125,7 @@ inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int Width,
 	}
 }
 
-inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int Width, int Height, int Channels, int Radius)
+static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int Width, int Height, int Channels, int Radius)
 {
 	int iScale = (int)((256.0f * 256.0f) / (2 * Radius + 1));
 	int iWidthStep = Width * Channels;
@@ -3969,7 +3969,7 @@ bool CPUImageGetImageSize(const char *file_path, int *width, int *height, int *f
 	}
 	else
 	{
-		*file_size = st.st_size;
+		*file_size = (int)st.st_size;
 	}
 	if (fread(&sigBuf, 26, 1, fp) < 1)
 	{
@@ -3994,21 +3994,22 @@ bool CPUImageGetImageSize(const char *file_path, int *width, int *height, int *f
 	{
 		// image type:   png
 		unsigned long *size_info = (unsigned long *)(sigBuf + 16);
-		*width = byteswap_ulong(size_info[0]);
-		*height = byteswap_ulong(size_info[1]);
+		*width = (int)byteswap_ulong(size_info[0]);
+		*height =(int) byteswap_ulong(size_info[1]);
 		has_image_size = true;
 	}
 	else if ((*file_size >= 16) && (memcmp(sigBuf, png_signature, strlen(png_signature)) == 0))
 	{
 		// image type: old png
 		unsigned long *size_info = (unsigned long *)(sigBuf + 8);
-		*width = byteswap_ulong(size_info[0]);
-		*height = byteswap_ulong(size_info[1]);
+		*width = (int)byteswap_ulong(size_info[0]);
+		*height = (int)byteswap_ulong(size_info[1]);
 		has_image_size = true;
 	}
 	else if ((*file_size >= 2) && (memcmp(sigBuf, jpeg_signature, strlen(jpeg_signature)) == 0))
 	{
 		// image type: jpeg
+		printf("Jpeg");
 		fseek(fp, 0, SEEK_SET);
 		char b = 0;
 		fread(&sigBuf, 2, 1, fp);
@@ -4032,6 +4033,7 @@ bool CPUImageGetImageSize(const char *file_path, int *width, int *height, int *f
 				unsigned short *size_info = (unsigned short *)(sigBuf);
 				h = byteswap_ushort(size_info[0]);
 				w = byteswap_ushort(size_info[1]);
+				break;
 			}
 			else
 			{
@@ -4052,7 +4054,7 @@ bool CPUImageGetImageSize(const char *file_path, int *width, int *height, int *f
 	else if ((*file_size >= 26) && (memcmp(sigBuf, bmp_signature, strlen(bmp_signature)) == 0))
 	{
 		// image type: bmp
-		unsigned int header_size = (*(sigBuf + 14));
+		unsigned int header_size = (unsigned  int)(*(sigBuf + 14));
 		if (header_size == 12)
 		{
 			unsigned short *size_info = (unsigned short *)(sigBuf + 18);
@@ -4071,13 +4073,13 @@ bool CPUImageGetImageSize(const char *file_path, int *width, int *height, int *f
 	{
 		// image type: ico
 		fseek(fp, 0, SEEK_SET);
-		unsigned short format = -1;
-		unsigned short reserved = -1;
+		unsigned short format = 0;
+		unsigned short reserved = 0;
 		fread(&reserved, 2, 1, fp);
 		fread(&format, 2, 1, fp);
 		if (reserved == 0 && format == 1)
 		{
-			unsigned short num = -1;
+			unsigned short num = 0;
 			fread(&num, 2, 1, fp);
 			if (num > 1)
 			{
