@@ -10,6 +10,10 @@
 extern "C" {
 #endif 
  
+#if defined(_MSC_VER) && (_MSC_VER >= 1310) /*Visual Studio: A few warning types are not desired here.*/
+#pragma warning( disable : 4996 ) /*VS does not like fopen, but fopen_s is not standard C so unusable here*/
+#endif /*_MSC_VER */
+
 #ifndef clamp
 #define clamp(value,min,max)  ((value) > (max )? (max ): (value) < (min) ? (min) : (value))
 #endif 
@@ -124,6 +128,9 @@ int CPUImageHoughLines(unsigned char *Input, int Width, int Height, int lineInte
 void CPUImageDrawLine(unsigned char *canvas, int width, int height, int stride, int x1, int y1, int x2, int y2, unsigned char R, unsigned char G, unsigned char B);
 //--------------------------Image processing--------------------------
  
+ //--------------------------preImage processing--------------------------
+bool CPUImageGetImageSize(const char* file_path, int*width, int*height, int * file_size);
+ //--------------------------preImage processing--------------------------
  
 #ifdef __cplusplus
 }
