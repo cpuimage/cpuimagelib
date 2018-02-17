@@ -34,18 +34,12 @@ extern "C" {
 #endif
 
 typedef struct
-{
-	//ɫ����Сֵ
-	int levelMinimum;
-	//ɫ���м�ֵ
-	int levelMiddle;
-	//ɫ�����ֵ
-	int levelMaximum;
-	//��С���ֵ
-	int minOutput;
-	//������ֵ
-	int maxOutput;
-	//�Ƿ�Ӧ��
+{ 
+	int levelMinimum; 
+	int levelMiddle; 
+	int levelMaximum; 
+	int minOutput; 
+	int maxOutput; 
 	bool Enable;
 } cpuLevelParams;
 

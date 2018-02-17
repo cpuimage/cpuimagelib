@@ -8,7 +8,6 @@
 #include <unistd.h>
 #endif
 #include "cpuimage.h"
-#include "cpuimage.c"
 #define STB_IMAGE_STATIC
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
@@ -46,7 +45,7 @@ static uint64_t nanotimer()
 		}
 		ever = 1;
 	}
-	return (frequency.denom) / (frequency.numer);
+	return mach_absolute_time() * frequency.numer / frequency.denom;
 #elif defined(_WIN32)
 	static LARGE_INTEGER frequency;
 	if (!ever)
