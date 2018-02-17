@@ -5,4 +5,4 @@ set(CMAKE_CXX_STANDARD 11)
 
 add_executable(demo
         cpuimage.c
-        demo.c )
+        demo.c browse.h)

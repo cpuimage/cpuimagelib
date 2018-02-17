@@ -2,11 +2,12 @@
 #if defined(_MSC_VER)
 #define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
-#define USE_SHELL_OPEN
 #define access _access
 #else
 #include <unistd.h>
 #endif
+#include "browse.h"
+#define USE_SHELL_OPEN
 #include "cpuimage.h"
 #define STB_IMAGE_STATIC
 #define STB_IMAGE_IMPLEMENTATION
@@ -120,9 +121,7 @@ void saveImage(const char *filename, int Width, int Height, int Channels, unsign
 	}
 
 #ifdef USE_SHELL_OPEN
-	ShellExecuteA(NULL, "open", saveFile, NULL, NULL, SW_SHOW);
-#else
-		//其他平台暂不实现
+    browse(saveFile);
 #endif
 }
 
