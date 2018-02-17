@@ -71,7 +71,7 @@ static inline unsigned short byteswap_ushort(unsigned short i)
 
 static inline unsigned char step(unsigned char edge, unsigned char x)
 {
-	return x < edge ? 0 : 255;
+	return (unsigned char)(x < edge ? 0 : 255);
 }
 
 static inline int Abs(int x)
@@ -122,39 +122,32 @@ void CPUImageGrayscaleFilter(unsigned char *Input, unsigned char *Output, int Wi
 		{
 			unsigned char *LinePS = Input + Y * Stride;
 			unsigned char *LinePD = Output + Y * Width;
-			int X = 0;
-			for (; X < Width - 4; X += 4, LinePS += Channel * 4)
-			{
-				LinePD[X + 0] = (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
-				LinePD[X + 1] = (B_WT * LinePS[3] + G_WT * LinePS[4] + R_WT * LinePS[5]) >> 8;
-				LinePD[X + 2] = (B_WT * LinePS[6] + G_WT * LinePS[7] + R_WT * LinePS[8]) >> 8;
-				LinePD[X + 3] = (B_WT * LinePS[9] + G_WT * LinePS[10] + R_WT * LinePS[11]) >> 8;
-			}
-			for (; X < Width; X++, LinePS += Channel)
-			{
-				LinePD[X] = (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
-			}
-		}
-	}
-	else if (Channel == 4)
-	{
-		for (int Y = 0; Y < Height; Y++)
-		{
-			unsigned char *LinePS = Input + Y * Stride;
-			unsigned char *LinePD = Output + Y * Width;
-			int X = 0;
-			for (; X < Width - 4; X += 4, LinePS += Channel * 4)
-			{
-				LinePD[X + 0] = (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
-				LinePD[X + 1] = (B_WT * LinePS[4] + G_WT * LinePS[5] + R_WT * LinePS[6]) >> 8;
-				LinePD[X + 2] = (B_WT * LinePS[8] + G_WT * LinePS[9] + R_WT * LinePS[10]) >> 8;
-				LinePD[X + 3] = (B_WT * LinePS[12] + G_WT * LinePS[13] + R_WT * LinePS[14]) >> 8;
-			}
-			for (; X < Width; X++, LinePS += Channel)
-			{
-				LinePD[X] = (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
-			}
-		}
+            int X = 0;
+            for (; X < Width - 4; X += 4, LinePS += Channel * 4) {
+                LinePD[X + 0] = (unsigned char) (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
+                LinePD[X + 1] = (unsigned char) (B_WT * LinePS[3] + G_WT * LinePS[4] + R_WT * LinePS[5]) >> 8;
+                LinePD[X + 2] = (unsigned char) (B_WT * LinePS[6] + G_WT * LinePS[7] + R_WT * LinePS[8]) >> 8;
+                LinePD[X + 3] = (unsigned char) (B_WT * LinePS[9] + G_WT * LinePS[10] + R_WT * LinePS[11]) >> 8;
+            }
+            for (; X < Width; X++, LinePS += Channel) {
+                LinePD[X] = (unsigned char) (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
+            }
+        }
+    } else if (Channel == 4) {
+        for (int Y = 0; Y < Height; Y++) {
+            unsigned char *LinePS = Input + Y * Stride;
+            unsigned char *LinePD = Output + Y * Width;
+            int X = 0;
+            for (; X < Width - 4; X += 4, LinePS += Channel * 4) {
+                LinePD[X + 0] = (unsigned char) (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
+                LinePD[X + 1] = (unsigned char) (B_WT * LinePS[4] + G_WT * LinePS[5] + R_WT * LinePS[6]) >> 8;
+                LinePD[X + 2] = (unsigned char) (B_WT * LinePS[8] + G_WT * LinePS[9] + R_WT * LinePS[10]) >> 8;
+                LinePD[X + 3] = (unsigned char) (B_WT * LinePS[12] + G_WT * LinePS[13] + R_WT * LinePS[14]) >> 8;
+            }
+            for (; X < Width; X++, LinePS += Channel) {
+                LinePD[X] = (unsigned char) (B_WT * LinePS[0] + G_WT * LinePS[1] + R_WT * LinePS[2]) >> 8;
+            }
+        }
 	}
 	else if (Channel == 1)
 	{
@@ -208,7 +201,7 @@ void CPUImageAverageLuminanceThresholdFilter(unsigned char *Input, unsigned char
 	unsigned char Luminance = 0;
 	if (Channels == 1)
 	{
-		unsigned int numberOfPixels = Width * Height;
+        int numberOfPixels = Width * Height;
 		unsigned int histogramGray[256] = {0};
 		for (int Y = 0; Y < Height; Y++)
 		{
@@ -241,7 +234,7 @@ void CPUImageAverageLuminanceThresholdFilter(unsigned char *Input, unsigned char
 	else if (Channels == 3 || Channels == 4)
 	{
 
-		unsigned int numberOfPixels = Width * Height;
+        int numberOfPixels = Width * Height;
 		unsigned int histogramLum[256] = {0};
 		for (int Y = 0; Y < Height; Y++)
 		{
@@ -267,7 +260,7 @@ void CPUImageAverageLuminanceThresholdFilter(unsigned char *Input, unsigned char
 			unsigned char *pInput = Input + (Y * Stride);
 			for (int X = 0; X < Width; X++)
 			{
-				unsigned char luminance = ((13926 * pInput[0] + 46884 * pInput[1] + 4725 * pInput[2]) >> 16);
+				unsigned char luminance =(unsigned char)((13926 * pInput[0] + 46884 * pInput[1] + 4725 * pInput[2]) >> 16);
 				pOutput[2] = pOutput[1] = pOutput[0] = step(Luminance, luminance);
 				pInput += Channels;
 				pOutput += Channels;
@@ -336,7 +329,7 @@ void CPUImageAverageColor(unsigned char *Input, int Width, int Height, int Strid
 	int Channels = Stride / Width;
 	if (Channels == 1)
 	{
-		unsigned int numberOfPixels = Width * Height;
+        int numberOfPixels = Width * Height;
 		unsigned int histogramGray[256] = {0};
 		for (int Y = 0; Y < Height; Y++)
 		{
@@ -352,7 +345,7 @@ void CPUImageAverageColor(unsigned char *Input, int Width, int Height, int Strid
 		{
 			Sum += histogramGray[i] * i;
 		}
-		*AverageR = Sum / numberOfPixels;
+		*AverageR = (unsigned char)(Sum / numberOfPixels);
 		*AverageG = *AverageR;
 		*AverageB = *AverageR;
 		*AverageA = *AverageR;
@@ -360,7 +353,7 @@ void CPUImageAverageColor(unsigned char *Input, int Width, int Height, int Strid
 	else if (Channels == 3)
 	{
 
-		unsigned int numberOfPixels = Width * Height;
+        int numberOfPixels = Width * Height;
 		unsigned int histogramRGB[768] = {0};
 		unsigned int *histogramR = &histogramRGB[0];
 		unsigned int *histogramG = &histogramRGB[256];
@@ -386,15 +379,15 @@ void CPUImageAverageColor(unsigned char *Input, int Width, int Height, int Strid
 			SumPixG += histogramG[i] * i;
 			SumPixB += histogramB[i] * i;
 		}
-		*AverageR = SumPixR / numberOfPixels;
-		*AverageG = SumPixG / numberOfPixels;
-		*AverageB = SumPixB / numberOfPixels;
+		*AverageR =(unsigned char) (SumPixR / numberOfPixels);
+		*AverageG =(unsigned char)(SumPixG / numberOfPixels);
+		*AverageB =(unsigned char) (SumPixB / numberOfPixels);
 		*AverageA = 255;
 	}
 	else if (Channels == 4)
 	{
 
-		unsigned int numberOfPixels = Width * Height;
+        int numberOfPixels = Width * Height;
 		unsigned int histogramRGB[768 + 256] = {0};
 		unsigned int *histogramR = &histogramRGB[0];
 		unsigned int *histogramG = &histogramRGB[256];
@@ -424,10 +417,10 @@ void CPUImageAverageColor(unsigned char *Input, int Width, int Height, int Strid
 			SumPixB += histogramB[i] * i;
 			SumPixA += histogramA[i] * i;
 		}
-		*AverageR = SumPixR / numberOfPixels;
-		*AverageG = SumPixG / numberOfPixels;
-		*AverageB = SumPixB / numberOfPixels;
-		*AverageA = SumPixA / numberOfPixels;
+		*AverageR =(unsigned char) (SumPixR / numberOfPixels);
+		*AverageG =(unsigned char) (SumPixG / numberOfPixels);
+		*AverageB =(unsigned char) (SumPixB / numberOfPixels);
+		*AverageA =(unsigned char) (SumPixA / numberOfPixels);
 	}
 }
 
@@ -491,7 +484,7 @@ void CPUImageLuminosity(unsigned char *Input, int Width, int Height, int Stride,
 	int Channels = Stride / Width;
 	if (Channels == 1)
 	{
-		unsigned int numberOfPixels = Width * Height;
+        int numberOfPixels = Width * Height;
 		unsigned int histogramGray[256] = {0};
 		for (int Y = 0; Y < Height; Y++)
 		{
@@ -512,7 +505,7 @@ void CPUImageLuminosity(unsigned char *Input, int Width, int Height, int Stride,
 	else if (Channels == 3 || Channels == 4)
 	{
 
-		unsigned int numberOfPixels = Width * Height;
+        int numberOfPixels = Width * Height;
 		unsigned int histogramLum[256] = {0};
 		for (int Y = 0; Y < Height; Y++)
 		{
@@ -571,7 +564,7 @@ void CPUImageColorMatrixFilter(unsigned char *Input, unsigned char *Output, int 
 		unsigned char *pDegreeMap = degreeMap + pixel * 256;
 		for (int out = 0; out < 256; out++)
 		{
-			pDegreeMap[0] = degree(pixel, out, intensity);
+			pDegreeMap[0] = degree((unsigned char)pixel, (unsigned char)out, intensity);
 			pDegreeMap++;
 		}
 	}
@@ -741,11 +734,11 @@ void CPUImageChromaKeyFilter(unsigned char *Input, unsigned char *Output, int Wi
 		return;
 	}
 
-	unsigned char maskY = (19589 * colorToReplaceR + 38443 * colorToReplaceG + 7504 * colorToReplaceB) >> 16;
+	unsigned char maskY =(unsigned char) ((19589 * colorToReplaceR + 38443 * colorToReplaceG + 7504 * colorToReplaceB) >> 16);
 
-	unsigned char maskCr = (46740 * (colorToReplaceR - maskY) >> 16) + 128;
+	unsigned char maskCr =(unsigned char) ((46740 * (colorToReplaceR - maskY) >> 16) + 128);
 
-	unsigned char maskCb = (37008 * (colorToReplaceB - maskY) >> 16) + 128;
+	unsigned char maskCb =(unsigned char) ((37008 * (colorToReplaceB - maskY) >> 16) + 128);
 	int iThresholdSensitivity = (int)(thresholdSensitivity * 255.0f);
 	int iSmoothing = (int)(smoothing * 256);
 	if (Channels == 3)
@@ -768,15 +761,15 @@ void CPUImageChromaKeyFilter(unsigned char *Input, unsigned char *Output, int Wi
 				const unsigned char R = pInput[0];
 				const unsigned char G = pInput[1];
 				const unsigned char B = pInput[2];
-				unsigned char Y = (19589 * R + 38443 * G + 7504 * B) >> 16;
-				unsigned char Cr = (46740 * (R - Y) >> 16) + 128;
-				unsigned char Cb = (37008 * (B - Y) >> 16) + 128;
+				unsigned char y = (unsigned char)((19589 * R + 38443 * G + 7504 * B) >> 16);
+				unsigned char Cr = (unsigned char)((46740 * (R - y) >> 16) + 128);
+				unsigned char Cb = (unsigned char)((37008 * (B - y) >> 16) + 128);
 				//乘以255取得mask,不乘以255则排除mask
 				short *pBlendMap = blendMap + (Cr << 8);
 				const short blendValue = pBlendMap[Cb];
-				pOutput[0] = 255 - (R * blendValue);
-				pOutput[1] = 255 - (G * blendValue);
-				pOutput[2] = 255 - (B * blendValue);
+				pOutput[0] =(unsigned char) (255 - (R * blendValue));
+				pOutput[1] =(unsigned char) (255 - (G * blendValue));
+				pOutput[2] =(unsigned char) (255 - (B * blendValue));
 				pInput += Channels;
 				pOutput += Channels;
 			}
@@ -803,9 +796,9 @@ void CPUImageChromaKeyFilter(unsigned char *Input, unsigned char *Output, int Wi
 				const unsigned char G = pInput[1];
 				const unsigned char B = pInput[2];
 				const unsigned char A = pInput[3];
-				unsigned char Y = (19589 * R + 38443 * G + 7504 * B) >> 16;
-				unsigned char Cr = (46740 * (R - Y) >> 16) + 128;
-				unsigned char Cb = (37008 * (B - Y) >> 16) + 128;
+				unsigned char y = (unsigned char)((19589 * R + 38443 * G + 7504 * B) >> 16);
+				unsigned char Cr =(unsigned char)((46740 * (R - y) >> 16) + 128);
+				unsigned char Cb = (unsigned char)((37008 * (B - y) >> 16) + 128);
 				//直接处理透明通道
 				unsigned char *pBlendMap = blendMap + (Cr << 8);
 				const unsigned char blendValue = pBlendMap[Cb];
@@ -873,7 +866,7 @@ void CPUImageLookupFilter(unsigned char *Input, unsigned char *Output, unsigned 
 	float *quad2xMap = &preMap[256 + 256 + 256 + 256];
 
 	unsigned short fractMap[256] = {0};
-	unsigned short sIntensity = max(min(intensity, 100), 0);
+	unsigned short sIntensity =(unsigned short) max(min(intensity, 100), 0);
 	int c1 = 256 * (100 - sIntensity) / 100;
 	int c2 = 256 * (100 - (100 - sIntensity)) / 100;
 
@@ -906,9 +899,9 @@ void CPUImageLookupFilter(unsigned char *Input, unsigned char *Output, unsigned 
 			unsigned char *pLineLookup1 = &lookupTable[(((int)(quad1yMap[B] + green) << 9) + (int)(quad1xMap[B] + red)) * lookupChannels];
 			unsigned char *pLineLookup2 = &lookupTable[(((int)(quad2yMap[B] + green) << 9) + (int)(quad2xMap[B] + red)) * lookupChannels];
 			unsigned short fractB = fractMap[B];
-			pOutput[0] = (int)(R * c1 + ((*pLineLookup1++ * (256 - fractB) + *pLineLookup2++ * fractB) >> 8) * c2) >> 8;
-			pOutput[1] = (int)(G * c1 + ((*pLineLookup1++ * (256 - fractB) + *pLineLookup2++ * fractB) >> 8) * c2) >> 8;
-			pOutput[2] = (int)(B * c1 + ((*pLineLookup1++ * (256 - fractB) + *pLineLookup2++ * fractB) >> 8) * c2) >> 8;
+			pOutput[0] = (unsigned char) ((int)(R * c1 + ((*pLineLookup1++ * (256 - fractB) + *pLineLookup2++ * fractB) >> 8) * c2) >> 8);
+			pOutput[1] = (unsigned char)((int)(G * c1 + ((*pLineLookup1++ * (256 - fractB) + *pLineLookup2++ * fractB) >> 8) * c2) >> 8);
+			pOutput[2] = (unsigned char)((int)(B * c1 + ((*pLineLookup1++ * (256 - fractB) + *pLineLookup2++ * fractB) >> 8) * c2) >> 8);
 			pInput += Channels;
 			pOutput += Channels;
 		}
@@ -951,7 +944,7 @@ void CPUImageSaturationFilter(unsigned char *Input, unsigned char *Output, int W
 		unsigned char *pSaturationMap = SaturationMap + (grey << 8);
 		for (int Input = 0; Input < 256; Input++)
 		{
-			pSaturationMap[0] = (unsigned char)((mix_u8(grey, Input, saturation) + Input) * 0.5f);
+			pSaturationMap[0] = (unsigned char)((mix_u8((unsigned char)grey,(unsigned char) Input, saturation) + Input) * 0.5f);
 			pSaturationMap++;
 		}
 	}
@@ -1192,7 +1185,7 @@ void CPUImageFalseColorFilter(unsigned char *Input, unsigned char *Output, int W
 	int Channels = Stride / Width;
 	if (Channels == 1)
 		return;
-	unsigned short sIntensity = max(min(intensity, 100), 0);
+	unsigned short sIntensity =(unsigned short) max(min(intensity, 100), 0);
 	int c1 = 256 * (100 - sIntensity) / 100;
 	int c2 = 256 * (100 - (100 - sIntensity)) / 100;
 
@@ -1212,11 +1205,11 @@ void CPUImageFalseColorFilter(unsigned char *Input, unsigned char *Output, int W
 		unsigned char *pInput = Input + (Y * Stride);
 		for (int X = 0; X < Width; X++)
 		{
-			unsigned char luminanceWeighting = ((13926 * pInput[0] + 46884 * pInput[1] + 4725 * pInput[2]) >> 16);
+			unsigned char luminanceWeighting =(unsigned char) ((13926 * pInput[0] + 46884 * pInput[1] + 4725 * pInput[2]) >> 16);
 
-			pOutput[0] = (pInput[0] * c1 + ColorMapR[luminanceWeighting] * c2) >> 8;
-			pOutput[1] = (pInput[1] * c1 + ColorMapG[luminanceWeighting] * c2) >> 8;
-			pOutput[2] = (pInput[2] * c1 + ColorMapB[luminanceWeighting] * c2) >> 8;
+			pOutput[0] =(unsigned char) ((pInput[0] * c1 + ColorMapR[luminanceWeighting] * c2) >> 8);
+			pOutput[1] =(unsigned char) ((pInput[1] * c1 + ColorMapG[luminanceWeighting] * c2) >> 8);
+			pOutput[2] =(unsigned char)((pInput[2] * c1 + ColorMapB[luminanceWeighting] * c2) >> 8);
 			pInput += Channels;
 			pOutput += Channels;
 		}
@@ -1260,7 +1253,7 @@ void CPUImageHazeFilter(unsigned char *Input, unsigned char *Output, int Width, 
 	int Channels = Stride / Width;
 	if (Channels == 1)
 		return;
-	unsigned short sIntensity = max(min(intensity, 100), 0);
+	unsigned short sIntensity = (unsigned short)max(min(intensity, 100), 0);
 	int c1 = 256 * (100 - sIntensity) / 100;
 	int c2 = 256 * (100 - (100 - sIntensity)) / 100;
 	short *distanceColorMap = (short *)malloc(Height * sizeof(short));
@@ -1290,9 +1283,9 @@ void CPUImageHazeFilter(unsigned char *Input, unsigned char *Output, int Width, 
 		unsigned char *pInput = Input + (Y * Stride);
 		for (int X = 0; X < Width; X++)
 		{
-			pOutput[0] = (int)(pInput[0] * c1 + ((ClampToByte(pInput[0] - distanceColorMap[Y]) * patchDistanceMap[Y]) >> 8) * c2) >> 8;
-			pOutput[1] = (int)(pInput[1] * c1 + ((ClampToByte(pInput[1] - distanceColorMap[Y]) * patchDistanceMap[Y]) >> 8) * c2) >> 8;
-			pOutput[2] = (int)(pInput[2] * c1 + ((ClampToByte(pInput[2] - distanceColorMap[Y]) * patchDistanceMap[Y]) >> 8) * c2) >> 8;
+			pOutput[0] = (unsigned char)((int)(pInput[0] * c1 + ((ClampToByte(pInput[0] - distanceColorMap[Y]) * patchDistanceMap[Y]) >> 8) * c2) >> 8);
+			pOutput[1] = (unsigned char)((int)(pInput[1] * c1 + ((ClampToByte(pInput[1] - distanceColorMap[Y]) * patchDistanceMap[Y]) >> 8) * c2) >> 8);
+			pOutput[2] = (unsigned char)((int)(pInput[2] * c1 + ((ClampToByte(pInput[2] - distanceColorMap[Y]) * patchDistanceMap[Y]) >> 8) * c2) >> 8);
 			pInput += Channels;
 			pOutput += Channels;
 		}
@@ -1418,27 +1411,27 @@ void CPUImageLevelsFilter(unsigned char *Input, unsigned char *Output, int Width
 	{
 		if (redLevelParams->Enable)
 		{
-			LevelMapR[pixel] = (mix_u8(redLevelParams->minOutput, redLevelParams->maxOutput, (powf(min(max(pixel - redLevelParams->levelMinimum, (0.0f)) / (redLevelParams->levelMaximum - redLevelParams->levelMinimum), (255)), 1.0f / (redLevelParams->levelMiddle * (1.0f / 255.0f))))));
+			LevelMapR[pixel] = (mix_u8( (unsigned char)redLevelParams->minOutput,  (unsigned char)redLevelParams->maxOutput, (powf(min(max(pixel - redLevelParams->levelMinimum, (0.0f)) / (redLevelParams->levelMaximum - redLevelParams->levelMinimum), (255)), 1.0f / (redLevelParams->levelMiddle * (1.0f / 255.0f))))));
 		}
 		else
 		{
-			LevelMapR[pixel] = pixel;
+			LevelMapR[pixel] = (unsigned char) pixel;
 		}
 		if (greenLevelParams->Enable)
 		{
-			LevelMapG[pixel] = (mix_u8(greenLevelParams->minOutput, greenLevelParams->maxOutput, (powf(min(max(pixel - greenLevelParams->levelMinimum, (0.0f)) / (greenLevelParams->levelMaximum - greenLevelParams->levelMinimum), (255)), 1.0f / (greenLevelParams->levelMiddle * (1.0f / 255.0f))))));
+			LevelMapG[pixel] = (mix_u8( (unsigned char)greenLevelParams->minOutput,  (unsigned char)greenLevelParams->maxOutput, (powf(min(max(pixel - greenLevelParams->levelMinimum, (0.0f)) / (greenLevelParams->levelMaximum - greenLevelParams->levelMinimum), (255)), 1.0f / (greenLevelParams->levelMiddle * (1.0f / 255.0f))))));
 		}
 		else
 		{
-			LevelMapG[pixel] = pixel;
+			LevelMapG[pixel] = (unsigned char) pixel;
 		}
 		if (blueLevelParams->Enable)
 		{
-			LevelMapB[pixel] = (mix_u8(blueLevelParams->minOutput, blueLevelParams->maxOutput, (powf(min(max(pixel - blueLevelParams->levelMinimum, (0.0f)) / (blueLevelParams->levelMaximum - blueLevelParams->levelMinimum), (255)), 1.0f / (blueLevelParams->levelMiddle * (1.0f / 255.0f))))));
+			LevelMapB[pixel] = (mix_u8( (unsigned char)blueLevelParams->minOutput,  (unsigned char)blueLevelParams->maxOutput, (powf(min(max(pixel - blueLevelParams->levelMinimum, (0.0f)) / (blueLevelParams->levelMaximum - blueLevelParams->levelMinimum), (255)), 1.0f / (blueLevelParams->levelMiddle * (1.0f / 255.0f))))));
 		}
 		else
 		{
-			LevelMapB[pixel] = pixel;
+			LevelMapB[pixel] = (unsigned char) pixel;
 		}
 	}
 
@@ -1516,9 +1509,9 @@ void CPUImageLevelsFilter(unsigned char *Input, unsigned char *Output, int Width
 /* RGB to YIQ */
 void rgb2yiq(unsigned char *R, unsigned char *G, unsigned char *B, short *Y, short *I, short *Q)
 {
-	*Y = ((int)(0.299f * 65536) * *R + (int)(0.587f * 65536) * *G + (int)(0.114f * 65536) * *B) >> 16;
-	*I = ((int)(0.595f * 65536) * *R - (int)(0.274453f * 65536) * *G - (int)(0.321263f * 65536) * *B) >> 16;
-	*Q = ((int)(0.211456f * 65536) * *R - (int)(0.522591f * 65536) * *G + (int)(0.311135f * 65536) * *B) >> 16;
+	*Y = (short) ((int)(0.299f * 65536) * *R + (int)(0.587f * 65536) * *G + (int)(0.114f * 65536) * *B) >> 16;
+	*I = (short) ((int)(0.595f * 65536) * *R - (int)(0.274453f * 65536) * *G - (int)(0.321263f * 65536) * *B) >> 16;
+	*Q = (short) ((int)(0.211456f * 65536) * *R - (int)(0.522591f * 65536) * *G + (int)(0.311135f * 65536) * *B) >> 16;
 }
 
 /* YIQ to RGB */
@@ -1659,7 +1652,7 @@ void CPUImageHighlightShadowTintFilter(unsigned char *Input, unsigned char *Outp
 			const unsigned char R = pInput[0];
 			const unsigned char G = pInput[1];
 			const unsigned char B = pInput[2];
-			unsigned short lum = ((13926 * R + 46884 * G + 4725 * B) >> 16) << 8;
+			unsigned short lum = (unsigned short)((13926 * R + 46884 * G + 4725 * B) >> 16) << 8;
 			unsigned char *pHighlightShadowMapR = HighlightShadowMapR + (lum);
 			unsigned char *pHighlightShadowMapG = HighlightShadowMapG + (lum);
 			unsigned char *pHighlightShadowMapB = HighlightShadowMapB + (lum);
@@ -1739,9 +1732,9 @@ void CPUImageHighlightShadowFilter(unsigned char *Input, unsigned char *Output, 
 			const short highlight = highlightMap[luminance];
 			short lshpixel = (luminance + shadow + highlight);
 			int *pDivLuminance = divLuminance + (luminance << 8);
-			pOutput[0] = (lshpixel * pDivLuminance[pInput[0]]) >> 8;
-			pOutput[1] = (lshpixel * pDivLuminance[pInput[1]]) >> 8;
-			pOutput[2] = (lshpixel * pDivLuminance[pInput[2]]) >> 8;
+			pOutput[0] =(unsigned char) ((lshpixel * pDivLuminance[pInput[0]]) >> 8);
+			pOutput[1] =(unsigned char) ((lshpixel * pDivLuminance[pInput[1]]) >> 8);
+			pOutput[2] =(unsigned char) ((lshpixel * pDivLuminance[pInput[2]]) >> 8);
 			pInput += Channels;
 			pOutput += Channels;
 		}
@@ -1794,7 +1787,7 @@ void CPUImageMonochromeFilter(unsigned char *Input, unsigned char *Output, int W
 	{
 		return;
 	}
-	unsigned short sIntensity = max(min(intensity, 100), 0);
+	unsigned short sIntensity = (unsigned short)max(min(intensity, 100), 0);
 	int c1 = 256 * (100 - sIntensity) / 100;
 	int c2 = 256 * (100 - (100 - sIntensity)) / 100;
 	float fColorR = (float)filterColorR * (1.0f / 255.0f);
@@ -1816,10 +1809,10 @@ void CPUImageMonochromeFilter(unsigned char *Input, unsigned char *Output, int W
 		unsigned char *pInput = Input + (Y * Stride);
 		for (int X = 0; X < Width; X++)
 		{
-			unsigned char lum = ((13926 * pInput[0] + 46884 * pInput[1] + 4725 * pInput[2]) >> 16);
-			pOutput[0] = (int)(pInput[0] * c1 + filterColorRMap[lum] * c2) >> 8;
-			pOutput[1] = (int)(pInput[1] * c1 + filterColorGMap[lum] * c2) >> 8;
-			pOutput[2] = (int)(pInput[2] * c1 + filterColorBMap[lum] * c2) >> 8;
+			unsigned char lum =(unsigned char) ((13926 * pInput[0] + 46884 * pInput[1] + 4725 * pInput[2]) >> 16);
+			pOutput[0] =(unsigned char)((int)(pInput[0] * c1 + filterColorRMap[lum] * c2) >> 8);
+			pOutput[1] =(unsigned char) ((int)(pInput[1] * c1 + filterColorGMap[lum] * c2) >> 8);
+			pOutput[2] =(unsigned char) ((int)(pInput[2] * c1 + filterColorBMap[lum] * c2) >> 8);
 			pInput += Channels;
 			pOutput += Channels;
 		}
@@ -1854,7 +1847,7 @@ void CPUImageColorInvertFilter(unsigned char *Input, unsigned char *Output, int 
 	unsigned char invertMap[256] = {0};
 	for (int pixel = 0; pixel < 256; pixel++)
 	{
-		invertMap[pixel] = (255 - pixel);
+		invertMap[pixel] =(unsigned char) (255 - pixel);
 	}
 	for (int Y = 0; Y < Height; Y++)
 	{
@@ -1979,7 +1972,7 @@ void CPUImageLuminanceThresholdFilter(unsigned char *Input, unsigned char *Outpu
 		unsigned char *pInput = Input + (Y * Stride);
 		for (int X = 0; X < Width; X++)
 		{
-			unsigned char luminance = ((13926 * pInput[0] + 46884 * pInput[1] + 4725 * pInput[2]) >> 16);
+			unsigned char luminance = (unsigned char)((13926 * pInput[0] + 46884 * pInput[1] + 4725 * pInput[2]) >> 16);
 			pOutput[2] = pOutput[1] = pOutput[0] = step(threshold, luminance);
 			pInput += Channels;
 			pOutput += Channels;
@@ -2072,9 +2065,9 @@ void CPUImageWhiteBalanceFilter(unsigned char *Input, unsigned char *Output, int
 			const unsigned char G = pInput[1];
 			const unsigned char B = pInput[2];
 
-			YPrime = ((int)(0.299f * 65536) * R + (int)(0.587f * 65536) * G + (int)(0.114f * 65536) * B) >> 16;
-			I = ((int)(0.595f * 65536) * R - (int)(0.274453f * 65536) * G - (int)(0.321263f * 65536) * B) >> 16;
-			Q = ((int)(0.211456f * 65536) * R - (int)(0.522591f * 65536) * G + (int)(0.311135f * 65536) * B) >> 16;
+			YPrime =(short) (((int)(0.299f * 65536) * R + (int)(0.587f * 65536) * G + (int)(0.114f * 65536) * B) >> 16);
+			I = (short)(((int)(0.595f * 65536) * R - (int)(0.274453f * 65536) * G - (int)(0.321263f * 65536) * B) >> 16);
+			Q = (short)(((int)(0.211456f * 65536) * R - (int)(0.522591f * 65536) * G + (int)(0.311135f * 65536) * B) >> 16);
 			//adjusting tint
 			Q = QTint[Q + 127];
 			//adjusting temperature
@@ -2289,7 +2282,7 @@ void rgb2hsv(const unsigned char *R, const unsigned char *G, const unsigned char
 
 	*H = (unsigned char)(h >> 1); // 0`179
 	*S = (unsigned char)s;		  // 0`255
-	*V = nMax;					  // 0`255
+	*V = (unsigned char)nMax;					  // 0`255
 }
 
 void hsv2rgb(const unsigned char *H, const unsigned char *S, const unsigned char *V, unsigned char *R, unsigned char *G, unsigned char *B)
@@ -2331,6 +2324,8 @@ void hsv2rgb(const unsigned char *H, const unsigned char *S, const unsigned char
 			g -= VS;
 			b -= (VSF >> 8);
 			break;
+        default:
+            break;
 		}
 		*R = (unsigned char)(r);
 		*G = (unsigned char)(g);
@@ -2365,7 +2360,7 @@ void CPUImageSkinToneFilter(unsigned char *Input, unsigned char *Output, int Wid
 			dist -= 1.0f;
 		if (dist < -0.5f)
 			dist += 1.0f;
-		dist = (float)(fabs(dist) * (1.0f / 0.5f)); // normalized to [0,1]
+		dist = (float)(fabsf(dist) * (1.0f / 0.5f)); // normalized to [0,1]
 		// Apply Gaussian like filter
 		float weightMap = clamp(expf(-dist * dist * skinHueThreshold), 0.0f, 1.0f);
 
@@ -2399,7 +2394,7 @@ void CPUImageSkinToneFilter(unsigned char *Input, unsigned char *Output, int Wid
 			// Convert color to HSV, extract hue
 			rgb2hsv(&R, &G, &B, &H, &S, &V);
 			// final color
-			_S = (S + satMap[H]);
+			_S = (unsigned char)(S + satMap[H]);
 			hsv2rgb(&hueMap[H], &_S, &V, &pOutput[0], &pOutput[1], &pOutput[2]);
 
 			pInput += Channels;
@@ -2423,9 +2418,9 @@ void CalGaussianCoeff(float sigma, float *a0, float *a1, float *a2, float *a3, f
 
 	if (sigma < 0.5f)
 		sigma = 0.5f;
-	alpha = (float)exp((0.726) * (0.726)) / sigma;
-	lamma = (float)exp(-alpha);
-	*b2 = (float)exp(-2 * alpha);
+	alpha = (float)expf((0.726) * (0.726)) / sigma;
+	lamma = (float)expf(-alpha);
+	*b2 = (float)expf(-2 * alpha);
 	k = (1 - lamma) * (1 - lamma) / (1 + 2 * alpha * lamma - (*b2));
 	*a0 = k;
 	*a1 = k * (alpha - 1) * lamma;
@@ -2436,7 +2431,7 @@ void CalGaussianCoeff(float sigma, float *a0, float *a1, float *a2, float *a3, f
 	*cnext = (*a2 + *a3) / (1 + *b1 + *b2);
 }
 
-void gaussianHorizontal(unsigned char *bufferPerLine, unsigned char *lpRowInitial, unsigned char *lpColumn, int width, int height, int Channels, int Nwidth, float a0a1, float a2a3, float b1b2, float cprev, float cnext)
+void gaussianHorizontal(unsigned char *bufferPerLine, const unsigned char *lpRowInitial, unsigned char *lpColumn, int width, int height, int Channels, int Nwidth, float a0a1, float a2a3, float b1b2, float cprev, float cnext)
 {
 	int HeightStep = Channels * height;
 	int WidthSubOne = width - 1;
@@ -2559,7 +2554,7 @@ void gaussianHorizontal(unsigned char *bufferPerLine, unsigned char *lpRowInitia
 	}
 }
 
-void gaussianVertical(unsigned char *bufferPerLine, unsigned char *lpRowInitial, unsigned char *lpColInitial, int height, int width, int Channels, float a0a1, float a2a3, float b1b2, float cprev, float cnext)
+void gaussianVertical(unsigned char *bufferPerLine, const unsigned char *lpRowInitial, unsigned char *lpColInitial, int height, int width, int Channels, float a0a1, float a2a3, float b1b2, float cprev, float cnext)
 {
 
 	int WidthStep = Channels * width;
@@ -2692,8 +2687,8 @@ void CPUImageGaussianBlurFilter(unsigned char *Input, unsigned char *Output, int
 	float b1b2 = (b1 + b2);
 
 	int bufferSizePerThread = (Width > Height ? Width : Height) * Channels;
-	unsigned char *bufferPerLine = (unsigned char *)malloc(bufferSizePerThread);
-	unsigned char *tempData = (unsigned char *)malloc(Height * Stride);
+	unsigned char *bufferPerLine = (unsigned char *)malloc((size_t)bufferSizePerThread);
+	unsigned char *tempData = (unsigned char *)malloc((size_t)Height * Stride);
 	if (bufferPerLine == NULL || tempData == NULL)
 	{
 		if (tempData)
@@ -2771,9 +2766,9 @@ void ycbcr2rgb(unsigned char y, unsigned char Cb, unsigned char Cr, unsigned cha
 		else
 			b = 255;
 	}
-	*R = r;
-	*G = g;
-	*B = b;
+	*R =(unsigned char) r;
+	*G =(unsigned char)g;
+	*B =(unsigned char)b;
 }
 
 void CPUImageUnsharpMaskFilter(unsigned char *Input, unsigned char *Output, int Width, int Height, int Stride, float GaussianSigma, int intensity)
@@ -2790,7 +2785,7 @@ void CPUImageUnsharpMaskFilter(unsigned char *Input, unsigned char *Output, int 
 		for (unsigned int PD = 0; PD < 256; PD++)
 		{
 			unsigned char retPD = ClampToByte((PS - PD) + 128);
-			retPD = ((PS <= 128) ? (retPD * PS / 128) : (255 - (255 - retPD) * (255 - PS) / 128));
+			retPD = (unsigned char)((PS <= 128) ? (retPD * PS / 128) : (255 - (255 - retPD) * (255 - PS) / 128));
 			//增强边缘法
 			//   unsigned char retPD = ClampToByte((PS - PD) + PS);
 			pUnsharpMaskMap[0] = ClampToByte((PS * c1 + retPD * c2) >> 8);
@@ -2880,7 +2875,7 @@ void CPUImageUnsharpMaskFilter(unsigned char *Input, unsigned char *Output, int 
 			for (int x = 0; x < Width; x++)
 			{
 				//锐化:高反差叠加
-				pOutput[0] = pInput[0] - pOutput[0] + 128;
+				pOutput[0] =(unsigned char)(pInput[0] - pOutput[0] + 128);
 				unsigned char *pUnsharpMaskMap = unsharpMaskMap + (pInput[0] << 8);
 				pOutput[0] = pUnsharpMaskMap[pOutput[0]];
 
@@ -2899,7 +2894,7 @@ void CPUImageUnsharpMaskFilter(unsigned char *Input, unsigned char *Output, int 
 	}
 }
 
-static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int Width, int Height, int Channels, int Radius)
+static inline void boxfilterRow(const unsigned char *Input, unsigned char *Output, int Width, int Height, int Channels, int Radius)
 {
 	int iRadius = Radius + 1;
 	int iScale = (int)((256.0f * 256.0f) / (2 * Radius + 1));
@@ -2921,7 +2916,7 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 				int p = (y * Width + x) * Channels;
 				sum += Input[p];
 			}
-			Output[iY] = (sum * iScale) >> 16;
+			Output[iY] = (unsigned char)((sum * iScale) >> 16);
 			for (int x = 1; x < iRadius; x++)
 			{
 				int pLeft = iY + x * Channels;
@@ -2929,7 +2924,7 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 
 				sum += Input[p0];
 				sum -= Input[iY];
-				Output[pLeft] = (sum * iScale) >> 16;
+				Output[pLeft] =(unsigned char)((sum * iScale) >> 16);
 			}
 
 			// 核心区域
@@ -2943,7 +2938,7 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 				sum += Input[i0];
 				sum -= Input[i1];
 
-				Output[pKernal] = (sum * iScale) >> 16;
+				Output[pKernal] = (unsigned char)((sum * iScale) >> 16);
 			}
 
 			// 处理右边缘
@@ -2955,7 +2950,7 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 
 				sum += Input[i0];
 				sum -= Input[i1];
-				Output[iRight] = (sum * iScale) >> 16;
+				Output[iRight] =(unsigned char)((sum * iScale) >> 16);
 			}
 		}
 		break;
@@ -2977,9 +2972,9 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 				sumG += Input[i + 1];
 				sumB += Input[i + 2];
 			}
-			Output[iY] = (sumR * iScale) >> 16;
-			Output[iY + 1] = (sumG * iScale) >> 16;
-			Output[iY + 2] = (sumB * iScale) >> 16;
+			Output[iY] =(unsigned char) ((sumR * iScale) >> 16);
+			Output[iY + 1] =(unsigned char) ((sumG * iScale) >> 16);
+			Output[iY + 2] =(unsigned char) ((sumB * iScale) >> 16);
 			for (int x = 1; x < iRadius; x++)
 			{
 				int iLeft = iY + x * Channels;
@@ -2991,9 +2986,9 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 				sumG -= Input[iY + 1];
 				sumB += Input[i0 + 2];
 				sumB -= Input[iY + 2];
-				Output[iLeft] = (sumR * iScale) >> 16;
-				Output[iLeft + 1] = (sumG * iScale) >> 16;
-				Output[iLeft + 2] = (sumB * iScale) >> 16;
+				Output[iLeft] =(unsigned char) ((sumR * iScale) >> 16);
+				Output[iLeft + 1] =(unsigned char) ((sumG * iScale) >> 16);
+				Output[iLeft + 2] =(unsigned char) ((sumB * iScale) >> 16);
 			}
 
 			// 核心区域
@@ -3012,9 +3007,9 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 
 				sumB += Input[i0 + 2];
 				sumB -= Input[i1 + 2];
-				Output[iKernal] = (sumR * iScale) >> 16;
-				Output[iKernal + 1] = (sumG * iScale) >> 16;
-				Output[iKernal + 2] = (sumB * iScale) >> 16;
+				Output[iKernal] = (unsigned char)((sumR * iScale) >> 16);
+				Output[iKernal + 1] = (unsigned char)((sumG * iScale) >> 16);
+				Output[iKernal + 2] =(unsigned char)((sumB * iScale) >> 16);
 			}
 
 			// 处理右边缘
@@ -3032,9 +3027,9 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 
 				sumB += Input[i0 + 2];
 				sumB -= Input[i1 + 2];
-				Output[iRight] = (sumR * iScale) >> 16;
-				Output[iRight + 1] = (sumG * iScale) >> 16;
-				Output[iRight + 2] = (sumB * iScale) >> 16;
+				Output[iRight] =(unsigned char) ((sumR * iScale) >> 16);
+				Output[iRight + 1] = (unsigned char) ((sumG * iScale) >> 16);
+				Output[iRight + 2] = (unsigned char) ((sumB * iScale) >> 16);
 			}
 		}
 		break;
@@ -3055,9 +3050,9 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 				sumG += Input[i + 1];
 				sumB += Input[i + 2];
 			}
-			Output[iY] = (sumR * iScale) >> 16;
-			Output[iY + 1] = (sumG * iScale) >> 16;
-			Output[iY + 2] = (sumB * iScale) >> 16;
+			Output[iY] = (unsigned char) ((sumR * iScale) >> 16);
+			Output[iY + 1] = (unsigned char) ((sumG * iScale) >> 16);
+			Output[iY + 2] =(unsigned char) ((sumB * iScale) >> 16);
 			Output[iY + 3] = Input[iY + 3];
 			for (int x = 1; x < iRadius; x++)
 			{
@@ -3069,9 +3064,9 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 				sumG -= Input[iLeft + 1];
 				sumB += Input[i0 + 2];
 				sumB -= Input[iLeft + 2];
-				Output[iLeft] = (sumR * iScale) >> 16;
-				Output[iLeft + 1] = (sumG * iScale) >> 16;
-				Output[iLeft + 2] = (sumB * iScale) >> 16;
+				Output[iLeft] = (unsigned char)((sumR * iScale) >> 16);
+				Output[iLeft + 1] =(unsigned char) ((sumG * iScale) >> 16);
+				Output[iLeft + 2] =(unsigned char) ((sumB * iScale) >> 16);
 				Output[iLeft + 3] = Input[iLeft + 3];
 			}
 
@@ -3091,9 +3086,9 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 
 				sumB += Input[i0 + 2];
 				sumB -= Input[i1 + 2];
-				Output[iKernal] = (sumR * iScale) >> 16;
-				Output[iKernal + 1] = (sumG * iScale) >> 16;
-				Output[iKernal + 2] = (sumB * iScale) >> 16;
+				Output[iKernal] =(unsigned char) ( (sumR * iScale) >> 16);
+				Output[iKernal + 1] =(unsigned char) ( (sumG * iScale) >> 16);
+				Output[iKernal + 2] =(unsigned char) ( (sumB * iScale) >> 16);
 				Output[iKernal + 3] = Input[iKernal + 3];
 			}
 
@@ -3112,9 +3107,9 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 
 				sumB += Input[i0 + 2];
 				sumB -= Input[i1 + 2];
-				Output[iRight] = (sumR * iScale) >> 16;
-				Output[iRight + 1] = (sumG * iScale) >> 16;
-				Output[iRight + 2] = (sumB * iScale) >> 16;
+				Output[iRight] = (unsigned char) ((sumR * iScale) >> 16);
+				Output[iRight + 1] =(unsigned char) ( (sumG * iScale) >> 16);
+				Output[iRight + 2] =(unsigned char) ( (sumB * iScale) >> 16);
 				Output[iRight + 3] = Input[iRight + 3];
 			}
 		}
@@ -3125,7 +3120,7 @@ static inline void boxfilterRow(unsigned char *Input, unsigned char *Output, int
 	}
 }
 
-static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int Width, int Height, int Channels, int Radius)
+static inline void boxfilterCol(const unsigned char *Input, unsigned char *Output, int Width, int Height, int Channels, int Radius)
 {
 	int iScale = (int)((256.0f * 256.0f) / (2 * Radius + 1));
 	int iWidthStep = Width * Channels;
@@ -3148,7 +3143,7 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 				int i = (y * Width + x) * Channels;
 				sum += Input[i];
 			}
-			Output[x] = (sum * iScale) >> 16;
+			Output[x] = (unsigned char) ((sum * iScale) >> 16);
 
 			for (int y = 1; y < iRadius; y++)
 			{
@@ -3159,7 +3154,7 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 
 				sum += Input[i0];
 				sum -= Input[i1];
-				Output[i] = (sum * iScale) >> 16;
+				Output[i] =(unsigned char) ( (sum * iScale) >> 16);
 			}
 
 			// 核心区域
@@ -3172,7 +3167,7 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 
 				sum += Input[i0];
 				sum -= Input[i1];
-				Output[iKernal] = (sum * iScale) >> 16;
+				Output[iKernal] = (unsigned char) ((sum * iScale) >> 16);
 			}
 
 			// 处理右边缘
@@ -3185,7 +3180,7 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 
 				sum += Input[i0];
 				sum -= Input[i1];
-				Output[iRight] = (sum * iScale) >> 16;
+				Output[iRight] =(unsigned char) ( (sum * iScale) >> 16);
 			}
 		}
 
@@ -3207,9 +3202,9 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 				sumG += Input[i + 1];
 				sumB += Input[i + 2];
 			}
-			Output[iX] = (sumR * iScale) >> 16;
-			Output[iX + 1] = (sumG * iScale) >> 16;
-			Output[iX + 2] = (sumB * iScale) >> 16;
+			Output[iX] = (unsigned char) ((sumR * iScale) >> 16);
+			Output[iX + 1] = (unsigned char) ((sumG * iScale) >> 16);
+			Output[iX + 2] = (unsigned char) ((sumB * iScale) >> 16);
 
 			for (int y = 1; y < iRadius; y++)
 			{
@@ -3222,9 +3217,9 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 				sumG -= Input[iX + 1];
 				sumB += Input[i0 + 2];
 				sumB -= Input[iX + 2];
-				Output[i] = (sumR * iScale) >> 16;
-				Output[i + 1] = (sumG * iScale) >> 16;
-				Output[i + 2] = (sumB * iScale) >> 16;
+				Output[i] = (unsigned char) ((sumR * iScale) >> 16);
+				Output[i + 1] =(unsigned char) ( (sumG * iScale) >> 16);
+				Output[i + 2] =(unsigned char) ( (sumB * iScale) >> 16);
 			}
 
 			// 核心区域
@@ -3242,9 +3237,9 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 				sumG -= Input[i1 + 1];
 				sumB += Input[i0 + 2];
 				sumB -= Input[i1 + 2];
-				Output[iKernal] = (sumR * iScale) >> 16;
-				Output[iKernal + 1] = (sumG * iScale) >> 16;
-				Output[iKernal + 2] = (sumB * iScale) >> 16;
+				Output[iKernal] = (unsigned char) ((sumR * iScale) >> 16);
+				Output[iKernal + 1] =(unsigned char) ( (sumG * iScale) >> 16);
+				Output[iKernal + 2] = (unsigned char) ((sumB * iScale) >> 16);
 			}
 
 			// 处理右边缘
@@ -3260,9 +3255,9 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 				sumG -= Input[i1 + 1];
 				sumB += Input[i0 + 2];
 				sumB -= Input[i1 + 2];
-				Output[iRight] = (sumR * iScale) >> 16;
-				Output[iRight + 1] = (sumG * iScale) >> 16;
-				Output[iRight + 2] = (sumB * iScale) >> 16;
+				Output[iRight] =(unsigned char) ( (sumR * iScale) >> 16);
+				Output[iRight + 1] = (unsigned char) ((sumG * iScale) >> 16);
+				Output[iRight + 2] = (unsigned char) ((sumB * iScale) >> 16);
 			}
 		}
 
@@ -3284,9 +3279,9 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 				sumG += Input[i + 1];
 				sumB += Input[i + 2];
 			}
-			Output[iX] = (sumR * iScale) >> 16;
-			Output[iX + 1] = (sumG * iScale) >> 16;
-			Output[iX + 2] = (sumB * iScale) >> 16;
+			Output[iX] = (unsigned char) ((sumR * iScale) >> 16);
+			Output[iX + 1] =(unsigned char) ( (sumG * iScale) >> 16);
+			Output[iX + 2] =(unsigned char) ( (sumB * iScale) >> 16);
 			Output[iX + 3] = Input[iX + 3];
 			for (int y = 1; y < iRadius; y++)
 			{
@@ -3298,9 +3293,9 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 				sumG -= Input[iX + 1];
 				sumB += Input[i0 + 2];
 				sumB -= Input[iX + 2];
-				Output[i] = (sumR * iScale) >> 16;
-				Output[i + 1] = (sumG * iScale) >> 16;
-				Output[i + 2] = (sumB * iScale) >> 16;
+				Output[i] =(unsigned char) ( (sumR * iScale) >> 16);
+				Output[i + 1] = (unsigned char) ((sumG * iScale) >> 16);
+				Output[i + 2] = (unsigned char) ((sumB * iScale) >> 16);
 				Output[i + 3] = Input[i + 3];
 			}
 
@@ -3317,9 +3312,9 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 				sumG -= Input[i1 + 1];
 				sumB += Input[i0 + 2];
 				sumB -= Input[i1 + 2];
-				Output[iKernal] = (sumR * iScale) >> 16;
-				Output[iKernal + 1] = (sumG * iScale) >> 16;
-				Output[iKernal + 2] = (sumB * iScale) >> 16;
+				Output[iKernal] = (unsigned char) ((sumR * iScale) >> 16);
+				Output[iKernal + 1] =(unsigned char) ( (sumG * iScale) >> 16);
+				Output[iKernal + 2] = (unsigned char) ((sumB * iScale) >> 16);
 				Output[iKernal + 3] = Input[iKernal + 3];
 			}
 
@@ -3336,9 +3331,9 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 				sumG -= Input[i1 + 1];
 				sumB += Input[i0 + 2];
 				sumB -= Input[i1 + 2];
-				Output[iRight] = (sumR * iScale) >> 16;
-				Output[iRight + 1] = (sumG * iScale) >> 16;
-				Output[iRight + 2] = (sumB * iScale) >> 16;
+				Output[iRight] = (unsigned char) ((sumR * iScale) >> 16);
+				Output[iRight + 1] = (unsigned char) ((sumG * iScale) >> 16);
+				Output[iRight + 2] = (unsigned char) ((sumB * iScale) >> 16);
 				Output[iRight + 3] = Input[iRight + 3];
 			}
 		}
@@ -3359,7 +3354,7 @@ static inline void boxfilterCol(unsigned char *Input, unsigned char *Output, int
 void CPUImageBoxBlurFilter(unsigned char *Input, unsigned char *Output, int Width, int Height, int Stride, int Radius)
 {
 	int Channels = Stride / Width;
-	unsigned char *temp = (unsigned char *)malloc(Width * Height * Channels);
+	unsigned char *temp = (unsigned char *)malloc((size_t)Width * Height * Channels);
 	if (temp == NULL)
 	{
 		return;
@@ -3383,7 +3378,7 @@ void CPUImageSharpenFilter(unsigned char *Input, unsigned char *Output, int Widt
 		for (unsigned int PD = 0; PD < 256; PD++)
 		{
 			unsigned char retPD = ClampToByte((sharpness * (PS - PD)) + 128);
-			retPD = ((PS <= 128) ? (retPD * PS / 128) : (255 - (255 - retPD) * (255 - PS) / 128));
+			retPD =(unsigned char) ((PS <= 128) ? (retPD * PS / 128) : (255 - (255 - retPD) * (255 - PS) / 128));
 			//增强边缘法
 			//   unsigned char retPD = ClampToByte(sharpness*(PS - PD) + PS);
 
@@ -3786,13 +3781,13 @@ void CPUImageSobelEdge(unsigned char *Input, unsigned char *Output, int Width, i
 
 int CPUImageHoughLines(unsigned char *Input, int Width, int Height, int lineIntensity, int Threshold, float resTheta, int numLine, float *Radius, float *Theta)
 {
-	int halfHoughWidth = (int)(sqrt((float)(Width * Width + Height * Height)));
+	int halfHoughWidth = (int)(sqrtf((float)(Width * Width + Height * Height)));
 	int houghWidth = halfHoughWidth * 2;
 	int maxTheta = (int)(180.0f / resTheta + 0.5f);
 	int houghMapSize = houghWidth * maxTheta;
-	unsigned short *houghMap = (unsigned short *)calloc(houghMapSize, sizeof(unsigned short));
-	float *sinLUT = (float *)calloc(maxTheta, sizeof(float));
-	float *cosLUT = (float *)calloc(maxTheta, sizeof(float));
+	unsigned short *houghMap = (unsigned short *)calloc((size_t)houghMapSize, sizeof(unsigned short));
+	float *sinLUT = (float *)calloc((size_t)maxTheta, sizeof(float));
+	float *cosLUT = (float *)calloc((size_t)maxTheta, sizeof(float));
 	if (sinLUT == NULL || cosLUT == NULL || houghMap == NULL)
 	{
 		if (houghMap)

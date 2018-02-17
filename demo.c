@@ -181,7 +181,7 @@ void getCurrentFilePath(const char *filePath, char *saveFile)
 	char fname[_MAX_FNAME];
 	char ext[_MAX_EXT];
 	splitpath(filePath, drive, dir, fname, ext);
-	int n = strlen(filePath);
+	size_t n = strlen(filePath);
 	memcpy(saveFile, filePath, n);
 	char *cur_saveFile = saveFile + (n - strlen(ext));
 	cur_saveFile[0] = '_';

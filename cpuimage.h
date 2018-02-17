@@ -1,12 +1,6 @@
 #ifndef _CPUIMAGE_HEADER_
 #define _CPUIMAGE_HEADER_
 
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-#include "fastmath.h"
-
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -37,6 +31,12 @@ extern "C" {
 #ifndef M_PI
 #define M_PI 3.14159265358979323846f
 #endif
+
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include "fastmath.h"
 
 typedef struct
 {
