@@ -1,51 +1,56 @@
-//Èç¹ûÊÇWindowsµÄ»°£¬µ÷ÓÃÏµÍ³API ShellExecuteA´ò¿ªÍ¼Æ¬
+//å¦‚æœæ˜¯Windowsçš„è¯ï¼Œè°ƒç”¨ç³»ç»ŸAPI ShellExecuteAæ‰“å¼€å›¾ç‰‡
 #if defined(_MSC_VER)
 #define _CRT_SECURE_NO_WARNINGS
 #include <windows.h>
 #define USE_SHELL_OPEN
+#define access _access
+#else
+#include <unistd.h>
 #endif
 #include "cpuimage.h"
+#include "cpuimage.c"
 #define STB_IMAGE_STATIC
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 //ref:https://github.com/nothings/stb/blob/master/stb_image.h
 #define TJE_IMPLEMENTATION
-#include "tiny_jpeg.h" 
+#include "tiny_jpeg.h"
 //ref:https://github.com/serge-rgb/TinyJPEG/blob/master/tiny_jpeg.h
-#include <math.h>
-#include <io.h>    
 #include <math.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
-//¼ÆÊ± 
+#include <stdio.h>
+//è®¡æ—¶
 #include <stdint.h>
-#if   defined(__APPLE__)
-# include <mach/mach_time.h>
+#if defined(__APPLE__)
+#include <mach/mach_time.h>
 #elif defined(_WIN32)
-# define WIN32_LEAN_AND_MEAN
-# include <windows.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #else // __linux
-# include <time.h>
-# ifndef  CLOCK_MONOTONIC //_RAW
-#  define CLOCK_MONOTONIC CLOCK_REALTIME
-# endif
+#include <time.h>
+#ifndef CLOCK_MONOTONIC //_RAW
+#define CLOCK_MONOTONIC CLOCK_REALTIME
 #endif
-static
-uint64_t nanotimer() {
+#endif
+static uint64_t nanotimer()
+{
 	static int ever = 0;
 #if defined(__APPLE__)
 	static mach_timebase_info_data_t frequency;
-	if (!ever) {
-		if (mach_timebase_info(&frequency) != KERN_SUCCESS) {
+	if (!ever)
+	{
+		if (mach_timebase_info(&frequency) != KERN_SUCCESS)
+		{
 			return 0;
 		}
 		ever = 1;
 	}
-	return;
+	return (frequency.denom) / (frequency.numer);
 #elif defined(_WIN32)
 	static LARGE_INTEGER frequency;
-	if (!ever) {
+	if (!ever)
+	{
 		QueryPerformanceFrequency(&frequency);
 		ever = 1;
 	}
@@ -54,8 +59,10 @@ uint64_t nanotimer() {
 	return (t.QuadPart * (uint64_t)1e9) / frequency.QuadPart;
 #else // __linux
 	struct timespec t;
-	if (!ever) {
-		if (clock_gettime(CLOCK_MONOTONIC, &spec) != 0) {
+	if (!ever)
+	{
+		if (clock_gettime(CLOCK_MONOTONIC, &spec) != 0)
+		{
 			return 0;
 		}
 		ever = 1;
@@ -68,84 +75,68 @@ uint64_t nanotimer() {
 static double now()
 {
 	static uint64_t epoch = 0;
-	if (!epoch) {
+	if (!epoch)
+	{
 		epoch = nanotimer();
 	}
 	return (nanotimer() - epoch) / 1e9;
 };
 
-double  calcElapsed(double start, double end)
+double calcElapsed(double start, double end)
 {
 	double took = -start;
 	return took + end;
 }
-
-
-
-//´æ´¢µ±Ç°´«ÈëÎÄ¼şÎ»ÖÃµÄ±äÁ¿
-char  saveFile[1024];
-//¼ÓÔØÍ¼Æ¬
-unsigned char * loadImage(const char *filename, int *Width, int *Height, int *Channels)
+#ifndef _MAX_DRIVE
+#define _MAX_DRIVE 3
+#endif
+#ifndef _MAX_FNAME
+#define _MAX_FNAME 256
+#endif
+#ifndef _MAX_EXT
+#define _MAX_EXT 256
+#endif
+#ifndef _MAX_DIR
+#define _MAX_DIR 256
+#endif
+//å­˜å‚¨å½“å‰ä¼ å…¥æ–‡ä»¶ä½ç½®çš„å˜é‡
+char saveFile[1024];
+//åŠ è½½å›¾ç‰‡
+unsigned char *loadImage(const char *filename, int *Width, int *Height, int *Channels)
 {
 
-	return    stbi_load(filename, Width, Height, Channels, 0);
+	return stbi_load(filename, Width, Height, Channels, 0);
 }
-//±£´æÍ¼Æ¬
+//ä¿å­˜å›¾ç‰‡
 void saveImage(const char *filename, int Width, int Height, int Channels, unsigned char *Output)
 {
 
 	memcpy(saveFile + strlen(saveFile), filename, strlen(filename));
 	*(saveFile + strlen(saveFile) + 1) = 0;
-	//±£´æÎªjpg
+	//ä¿å­˜ä¸ºjpg
 	if (!tje_encode_to_file(saveFile, Width, Height, Channels, true, Output))
 	{
-		fprintf(stderr, "Ğ´Èë JPEG ÎÄ¼şÊ§°Ü.\n");
+		fprintf(stderr, "å†™å…¥ JPEG æ–‡ä»¶å¤±è´¥.\n");
 		return;
 	}
 
-#ifdef USE_SHELL_OPEN 
+#ifdef USE_SHELL_OPEN
 	ShellExecuteA(NULL, "open", saveFile, NULL, NULL, SW_SHOW);
 #else
-	//ÆäËûÆ½Ì¨Ôİ²»ÊµÏÖ
+		//å…¶ä»–å¹³å°æš‚ä¸å®ç°
 #endif
 }
 
-
-#ifndef ClampToByte
-#define  ClampToByte(  v )  ( ((unsigned)(int)(v)) <(255) ? (v) : ((int)(v) < 0) ? (0) : (255)) 
-#endif 
-
-#define M_PI 3.14159265358979323846f
-
-typedef struct cpu_HoughLine
+//åˆ†å‰²è·¯å¾„å‡½æ•°
+void splitpath(const char *path, char *drv, char *dir, char *name, char *ext)
 {
-	float Theta;
-	int Radius;
-	int Intensity;
-	float RelativeIntensity;
-} cpu_HoughLine;
-
-
-typedef struct cpu_rect
-{
-	int  x;
-	int  y;
-	int  Width;
-	int  Height;
-} cpu_rect;
-
-#ifndef clamp
-#define clamp(value,min,max)  ((value) > (max )? (max ): (value) < (min) ? (min) : (value))
-#endif 
-
-//·Ö¸îÂ·¾¶º¯Êı
-void splitpath(const char* path, char* drv, char* dir, char* name, char* ext)
-{
-	const char* end;
-	const char* p;
-	const char* s;
-	if (path[0] && path[1] == ':') {
-		if (drv) {
+	const char *end;
+	const char *p;
+	const char *s;
+	if (path[0] && path[1] == ':')
+	{
+		if (drv)
+		{
 			*drv++ = *path++;
 			*drv++ = *path++;
 			*drv = '\0';
@@ -156,7 +147,8 @@ void splitpath(const char* path, char* drv, char* dir, char* name, char* ext)
 	for (end = path; *end && *end != ':';)
 		end++;
 	for (p = end; p > path && *--p != '\\' && *p != '/';)
-		if (*p == '.') {
+		if (*p == '.')
+		{
 			end = p;
 			break;
 		}
@@ -164,23 +156,26 @@ void splitpath(const char* path, char* drv, char* dir, char* name, char* ext)
 		for (s = end; (*ext = *s++);)
 			ext++;
 	for (p = end; p > path;)
-		if (*--p == '\\' || *p == '/') {
+		if (*--p == '\\' || *p == '/')
+		{
 			p++;
 			break;
 		}
-	if (name) {
+	if (name)
+	{
 		for (s = p; s < end;)
 			*name++ = *s++;
 		*name = '\0';
 	}
-	if (dir) {
+	if (dir)
+	{
 		for (s = path; s < p;)
 			*dir++ = *s++;
 		*dir = '\0';
 	}
 }
 
-//È¡µ±Ç°´«ÈëµÄÎÄ¼şÎ»ÖÃ
+//å–å½“å‰ä¼ å…¥çš„æ–‡ä»¶ä½ç½®
 void getCurrentFilePath(const char *filePath, char *saveFile)
 {
 	char drive[_MAX_DRIVE];
@@ -190,68 +185,67 @@ void getCurrentFilePath(const char *filePath, char *saveFile)
 	splitpath(filePath, drive, dir, fname, ext);
 	int n = strlen(filePath);
 	memcpy(saveFile, filePath, n);
-	char * cur_saveFile = saveFile + (n - strlen(ext));
+	char *cur_saveFile = saveFile + (n - strlen(ext));
 	cur_saveFile[0] = '_';
 	cur_saveFile[1] = 0;
 }
 
-
 int main(int argc, char **argv)
 {
 	printf("Image Processing \n ");
-	printf("²©¿Í:http://tntmonks.cnblogs.com/ \n ");
-	printf("Ö§³Ö½âÎöÈçÏÂÍ¼Æ¬¸ñÊ½: \n ");
+	printf("åšå®¢:http://tntmonks.cnblogs.com/ \n ");
+	printf("æ”¯æŒè§£æå¦‚ä¸‹å›¾ç‰‡æ ¼å¼: \n ");
 	printf("JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC \n ");
 
-	//¼ì²é²ÎÊıÊÇ·ñÕıÈ· 
+	//æ£€æŸ¥å‚æ•°æ˜¯å¦æ­£ç¡®
 	if (argc < 2)
 	{
-		printf("²ÎÊı´íÎó¡£ \n ");
-		printf("ÇëÍÏ·ÅÎÄ¼şµ½¿ÉÖ´ĞĞÎÄ¼şÉÏ£¬»òÊ¹ÓÃÃüÁîĞĞ£ºdemo.exe Í¼Æ¬ \n ");
-		printf("ÇëÍÏ·ÅÎÄ¼şÀıÈç: demo.exe d:\\image.jpg \n ");
+		printf("å‚æ•°é”™è¯¯ã€‚ \n ");
+		printf("è¯·æ‹–æ”¾æ–‡ä»¶åˆ°å¯æ‰§è¡Œæ–‡ä»¶ä¸Šï¼Œæˆ–ä½¿ç”¨å‘½ä»¤è¡Œï¼šdemo.exe å›¾ç‰‡ \n ");
+		printf("è¯·æ‹–æ”¾æ–‡ä»¶ä¾‹å¦‚: demo.exe d:\\image.jpg \n ");
 
 		return 0;
 	}
 
-	char*szfile = argv[1];
-	//¼ì²éÊäÈëµÄÎÄ¼şÊÇ·ñ´æÔÚ
-	if (_access(szfile, 0) == -1)
+	char *szfile = argv[1];
+	//æ£€æŸ¥è¾“å…¥çš„æ–‡ä»¶æ˜¯å¦å­˜åœ¨
+	if (access(szfile, 0) == -1)
 	{
-		printf("ÊäÈëµÄÎÄ¼ş²»´æÔÚ£¬²ÎÊı´íÎó£¡ \n ");
+		printf("è¾“å…¥çš„æ–‡ä»¶ä¸å­˜åœ¨ï¼Œå‚æ•°é”™è¯¯ï¼ \n ");
 	}
 
 	getCurrentFilePath(szfile, saveFile);
 
-	int Width = 0;                    //Í¼Æ¬¿í¶È
-	int Height = 0;                   //Í¼Æ¬¸ß¶È
-	int Channels = 0;                 //Í¼Æ¬Í¨µÀÊı
-	unsigned char *inputImage = NULL; //ÊäÈëÍ¼Æ¬Ö¸Õë
+	int Width = 0;					  //å›¾ç‰‡å®½åº¦
+	int Height = 0;					  //å›¾ç‰‡é«˜åº¦
+	int Channels = 0;				  //å›¾ç‰‡é€šé“æ•°
+	unsigned char *inputImage = NULL; //è¾“å…¥å›¾ç‰‡æŒ‡é’ˆ
 	double startTime = now();
-	//¼ÓÔØÍ¼Æ¬
+	//åŠ è½½å›¾ç‰‡
 	inputImage = loadImage(szfile, &Width, &Height, &Channels);
 
 	double nLoadTime = calcElapsed(startTime, now());
-	printf("¼ÓÔØºÄÊ±: %d ºÁÃë!\n ", (int)(nLoadTime * 1000));
+	printf("åŠ è½½è€—æ—¶: %d æ¯«ç§’!\n ", (int)(nLoadTime * 1000));
 	if ((Channels != 0) && (Width != 0) && (Height != 0))
 	{
-		//·ÖÅäÓëÔØÈëÍ¬µÈÄÚ´æÓÃÓÚ´¦ÀíºóÊä³ö½á¹û
+		//åˆ†é…ä¸è½½å…¥åŒç­‰å†…å­˜ç”¨äºå¤„ç†åè¾“å‡ºç»“æœ
 		unsigned char *outputImg = (unsigned char *)stbi__malloc(Width * Channels * Height * sizeof(unsigned char));
 		if (inputImage)
 		{
-			//Èç¹ûÍ¼Æ¬¼ÓÔØ³É¹¦£¬Ôò½«ÄÚÈİ¸´ÖÆ¸øÊä³öÄÚ´æ£¬·½±ã´¦Àí
+			//å¦‚æœå›¾ç‰‡åŠ è½½æˆåŠŸï¼Œåˆ™å°†å†…å®¹å¤åˆ¶ç»™è¾“å‡ºå†…å­˜ï¼Œæ–¹ä¾¿å¤„ç†
 			memcpy(outputImg, inputImage, Width * Channels * Height);
 		}
 		else
 		{
-			printf("¼ÓÔØÎÄ¼ş: %s Ê§°Ü!\n ", szfile);
+			printf("åŠ è½½æ–‡ä»¶: %s å¤±è´¥!\n ", szfile);
 		}
 		startTime = now();
 		float arrRho[100];
 		float arrTheta[100];
-		int	nTNum = 200;
+		int nTNum = 200;
 		int nTVal = 100;
 		float Theta = 1.0f;
-		CPUImageGrayscaleFilter(inputImage, outputImg, Width, Height, Width*Channels);
+		CPUImageGrayscaleFilter(inputImage, outputImg, Width, Height, Width * Channels);
 		CPUImageSobelEdge(outputImg, outputImg, Width, Height);
 		int nLine = CPUImageHoughLines(outputImg, Width, Height, nTNum, nTVal, Theta, 100, arrRho, arrTheta);
 		memcpy(outputImg, inputImage, Width * Channels * Height);
@@ -259,28 +253,28 @@ int main(int argc, char **argv)
 		{
 			if (arrTheta[i] == 90)
 			{
-				CPUImageDrawLine(outputImg, Width, Height, Width*Channels, (int)arrRho[i], 0, (int)arrRho[i], Height - 1, 255, 0, 0);
+				CPUImageDrawLine(outputImg, Width, Height, Width * Channels, (int)arrRho[i], 0, (int)arrRho[i], Height - 1, 255, 0, 0);
 			}
 			else
 			{
 				int x1 = 0;
 				int y1 = (int)(arrRho[i] / fastCos(arrTheta[i] * M_PI / 180.0f) + 0.5f);
 				int x2 = Width - 1;
-				int y2 = (int)((arrRho[i] - x2*fastSin(arrTheta[i] * M_PI / 180.0f)) / fastCos(arrTheta[i] * M_PI / 180.0f) + 0.5f);
-				CPUImageDrawLine(outputImg, Width, Height, Width*Channels, x1, y1, x2, y2, 255, 0, 0);
+				int y2 = (int)((arrRho[i] - x2 * fastSin(arrTheta[i] * M_PI / 180.0f)) / fastCos(arrTheta[i] * M_PI / 180.0f) + 0.5f);
+				CPUImageDrawLine(outputImg, Width, Height, Width * Channels, x1, y1, x2, y2, 255, 0, 0);
 			}
 		}
-		//´¦ÀíËã·¨
-		double 	nProcessTime = now();
-		printf("´¦ÀíºÄÊ±: %d ºÁÃë!\n ", (int)(nProcessTime * 1000));
-		//±£´æ´¦ÀíºóµÄÍ¼Æ¬
+		//å¤„ç†ç®—æ³•
+		double nProcessTime = now();
+		printf("å¤„ç†è€—æ—¶: %d æ¯«ç§’!\n ", (int)(nProcessTime * 1000));
+		//ä¿å­˜å¤„ç†åçš„å›¾ç‰‡
 		startTime = now();
 
 		saveImage("_done.jpg", Width, Height, Channels, outputImg);
 		double nSaveTime = calcElapsed(startTime, now());
 
-		printf("±£´æºÄÊ±: %d ºÁÃë!\n ", (int)(nSaveTime * 1000));
-		//ÊÍ·ÅÕ¼ÓÃµÄÄÚ´æ
+		printf("ä¿å­˜è€—æ—¶: %d æ¯«ç§’!\n ", (int)(nSaveTime * 1000));
+		//é‡Šæ”¾å ç”¨çš„å†…å­˜
 		if (outputImg)
 		{
 			stbi_image_free(outputImg);
@@ -295,11 +289,11 @@ int main(int argc, char **argv)
 	}
 	else
 	{
-		printf("¼ÓÔØÎÄ¼ş: %s Ê§°Ü!\n", szfile);
+		printf("åŠ è½½æ–‡ä»¶: %s å¤±è´¥!\n", szfile);
 	}
 
 	getchar();
-	printf("°´ÈÎÒâ¼üÍË³ö³ÌĞò \n");
+	printf("æŒ‰ä»»æ„é”®é€€å‡ºç¨‹åº \n");
 
 	return EXIT_SUCCESS;
 }

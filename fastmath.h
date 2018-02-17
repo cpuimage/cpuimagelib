@@ -1,12 +1,11 @@
 #ifndef _CPUIMAGE_FASTMATH_HEADER_
-#define  _CPUIMAGE_FASTMATH_HEADER_
+#define _CPUIMAGE_FASTMATH_HEADER_
 #include <stdlib.h>
 #include <math.h>
 
 #ifndef FAST_MATH_TABLE_SIZE
-#define FAST_MATH_TABLE_SIZE  512
+#define FAST_MATH_TABLE_SIZE 512
 #endif
-
 
 static const float sinTable_f32[FAST_MATH_TABLE_SIZE + 1] = {
 	0.00000000f, 0.01227154f, 0.02454123f, 0.03680722f, 0.04906767f, 0.06132074f,
@@ -102,14 +101,13 @@ static const float sinTable_f32[FAST_MATH_TABLE_SIZE + 1] = {
 	-0.23105811f, -0.21910124f, -0.20711138f, -0.19509032f, -0.18303989f,
 	-0.17096189f, -0.15885814f, -0.14673047f, -0.13458071f, -0.12241068f,
 	-0.11022221f, -0.09801714f, -0.08579731f, -0.07356456f, -0.06132074f,
-	-0.04906767f, -0.03680722f, -0.02454123f, -0.01227154f, -0.00000000f
-};
+	-0.04906767f, -0.03680722f, -0.02454123f, -0.01227154f, -0.00000000f};
 
-inline float  fastSin(
+inline float fastSin(
 	float x)
 {
 	float sinVal, fract, in;
-	unsigned short  index;
+	unsigned short index;
 	float a, b;
 	int n;
 	float findex;
@@ -126,7 +124,8 @@ inline float  fastSin(
 	in = in - (float)n;
 
 	findex = (float)FAST_MATH_TABLE_SIZE * in;
-	if (findex >= 512.0f) {
+	if (findex >= 512.0f)
+	{
 		findex -= 512.0f;
 	}
 
@@ -137,12 +136,12 @@ inline float  fastSin(
 	a = sinTable_f32[index];
 	b = sinTable_f32[index + 1];
 
-	sinVal = (1.0f - fract)*a + fract*b;
+	sinVal = (1.0f - fract) * a + fract * b;
 
 	return (sinVal);
 }
 
-inline float  fastCos(
+inline float fastCos(
 	float x)
 {
 	float cosVal, fract, in;
@@ -170,7 +169,7 @@ inline float  fastCos(
 	a = sinTable_f32[index];
 	b = sinTable_f32[index + 1];
 
-	cosVal = (1.0f - fract)*a + fract*b;
+	cosVal = (1.0f - fract) * a + fract * b;
 
 	return (cosVal);
 }
