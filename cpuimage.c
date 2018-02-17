@@ -3614,19 +3614,19 @@ void CPUImageAutoLevel(const unsigned char *Input, unsigned char *Output, int Wi
 		for (int i = 0; i < 256; i++)
 		{
 			if (i < thresholdRMin)
-				MapR[i] = (i + 0) >> 1;
+				MapR[i] =(unsigned char) ((i + 0) >> 1);
 			else if (i > thresholdRMax)
 				MapR[i] = (255);
 			else
 				MapR[i] = ClampToByte((int)((i - thresholdRMin) * 255.0) / (thresholdRMax - thresholdRMin));
 			if (i < thresholdGMin)
-				MapG[i] = (i + 0) >> 1;
+				MapG[i] =(unsigned char) ((i + 0) >> 1);
 			else if (i > thresholdGMax)
 				MapG[i] = (255);
 			else
 				MapG[i] = ClampToByte((int)((i - thresholdGMin) * 255.0) / (thresholdGMax - thresholdGMin));
 			if (i < thresholdBMin)
-				MapB[i] = (0);
+				MapB[i] = (unsigned char) ((i + 0) >> 1);
 			else if (i > thresholdBMax)
 				MapB[i] = (255);
 			else
