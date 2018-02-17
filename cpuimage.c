@@ -3995,7 +3995,7 @@ bool CPUImageGetImageSize(const char *file_path, int *width, int *height, int *f
 		// image type:   png
 		unsigned long *size_info = (unsigned long *)(sigBuf + 16);
 		*width = (int)byteswap_ulong(size_info[0]);
-		*height =(int) byteswap_ulong(size_info[1]);
+		*height = (int)byteswap_ulong(size_info[1]);
 		has_image_size = true;
 	}
 	else if ((*file_size >= 16) && (memcmp(sigBuf, png_signature, strlen(png_signature)) == 0))
@@ -4054,7 +4054,7 @@ bool CPUImageGetImageSize(const char *file_path, int *width, int *height, int *f
 	else if ((*file_size >= 26) && (memcmp(sigBuf, bmp_signature, strlen(bmp_signature)) == 0))
 	{
 		// image type: bmp
-		unsigned int header_size = (unsigned  int)(*(sigBuf + 14));
+		unsigned int header_size = (unsigned int)(*(sigBuf + 14));
 		if (header_size == 12)
 		{
 			unsigned short *size_info = (unsigned short *)(sigBuf + 18);
