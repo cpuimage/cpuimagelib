@@ -12,12 +12,8 @@
 #pragma comment(lib,"shell32.lib")
 
 static void browse(const char *url)
-{
-#if _MSC_VER
-    ShellExecute(NULL,(LPCWSTR) "open",(LPCWSTR) url, NULL, NULL, SW_SHOWNORMAL);
-#else
-	ShellExecute(NULL,"open", url, NULL, NULL, SW_SHOWNORMAL);
-#endif
+{ 
+	ShellExecuteA(NULL,"open", url, NULL, NULL, SW_SHOWNORMAL);
 }
 
 #endif
