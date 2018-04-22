@@ -191,7 +191,7 @@ void getCurrentFilePath(const char *filePath, char *saveFile)
 int main(int argc, char **argv)
 {
 	printf("Image Processing \n ");
-	printf("博客:http://tntmonks.cnblogs.com/ \n ");
+	printf("博客:http://cpuimage.cnblogs.com/ \n ");
 	printf("支持解析如下图片格式: \n ");
 	printf("JPG, PNG, TGA, BMP, PSD, GIF, HDR, PIC \n ");
 
