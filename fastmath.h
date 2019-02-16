@@ -16,6 +16,6 @@ static inline float fastSin(
 static inline float fastCos(
 	float x)
 {
-    return PT_sinf(x + 1.570796327f);
+    return fastSin(x + 1.570796327f);
 }
 #endif
